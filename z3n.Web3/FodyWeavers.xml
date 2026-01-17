@@ -1,0 +1,17 @@
+<Weavers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FodyWeavers.xsd">
+    <Costura>
+        <IncludeAssemblies>
+            Nethereum.ABI
+            Nethereum.HdWallet
+            Nethereum.Web3
+            Nethereum.Accounts
+            Nethereum.RPC
+            Nethereum.Hex
+            Nethereum.Signer
+            Nethereum.Util
+            Nethereum.JsonRpc.Client
+            Nethereum.Signer.EIP712
+            Nethereum.Model
+        </IncludeAssemblies>
+    </Costura>
+</Weavers>
