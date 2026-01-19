@@ -6,15 +6,7 @@
     </PropertyGroup>
 
 
-    <PropertyGroup>
-        <Version>1.0.0.0</Version>
-        <AssemblyTitle>z3nWeb3</AssemblyTitle>
-        <Product>z3nLib</Product>
-        <Copyright>Copyright © w3bgr3p 2025</Copyright>
-        <Trademark></Trademark>
-        <Culture></Culture>
-        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    </PropertyGroup>
+
 
 
     <ItemGroup>
@@ -50,20 +42,6 @@
       <Folder Include="Api\" />
     </ItemGroup>
 
-    <Target Name="CopyToReleases" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
-        <PropertyGroup>
-            <ReleasesFolder>$(SolutionDir)Releases\</ReleasesFolder>
-        </PropertyGroup>
-
-        <MakeDir Directories="$(ReleasesFolder)" Condition="!Exists('$(ReleasesFolder)')" />
-
-        <Copy
-                SourceFiles="$(TargetPath)"
-                DestinationFolder="$(ReleasesFolder)"
-                SkipUnchangedFiles="true" />
-
-        <Message Text="Copied $(TargetFileName) to $(ReleasesFolder)" Importance="high" />
-    </Target>
 
 
 </Project>

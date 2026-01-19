@@ -1,0 +1,13 @@
+<Project>
+    <PropertyGroup>
+        <Version>2.1.0</Version>
+
+        <AssemblyTitle>$(MSBuildProjectName)</AssemblyTitle>
+        <Product>z3nLib</Product>
+        <Copyright>Copyright © w3bgr3p 2025</Copyright>
+        <Company>w3bgr3p</Company>
+        <Authors>w3bgr3p</Authors>
+
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    </PropertyGroup>
+</Project>

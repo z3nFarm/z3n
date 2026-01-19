@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Newtonsoft.Json.Linq;
 using ZennoLab.CommandCenter;
 using ZennoLab.InterfacesLibrary.Enums.Browser;
+using ZennoLab.InterfacesLibrary.ProjectModel;
 
 namespace z3nCore
 {
@@ -653,7 +655,21 @@ namespace z3nCore
                 catch { }
             }
         }
-        
+
+        public static void SetTimeFromDb(this Instance instance,  IZennoPosterProjectModel project)
+        {
+            var timezone = project.DbGet("timezone", "_instance");
+            if (string.IsNullOrEmpty(timezone))
+            {
+                project.warn("no time zone data found in db"); 
+                return;
+            }
+            JObject tz = JObject.Parse(timezone);
+            instance.TimezoneWorkMode = ZennoLab.InterfacesLibrary.Enums.Browser.TimezoneMode.Emulate;
+            instance.SetTimezone((int)tz["timezoneOffset"], 0);
+            instance.SetIanaTimezone(tz["timezoneName"].ToString());
+        }
+
         #endregion
 
 

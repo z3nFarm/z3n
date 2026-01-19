@@ -65,7 +65,7 @@ namespace z3nCore
             
         }
 
-        public void ParseStats()
+        public Dictionary<string,string> ParseStats()
         {
             AddTable();
             //var _sql = new Sql(_project);
@@ -75,7 +75,7 @@ namespace z3nCore
             string timezoneName = "";
 
             LoadStats();
-
+            var stats = new Dictionary<string, string>();
             var hardware = _instance.ActiveTab.FindElementById("webGL_anchor").ParentElement.GetChildren(false);
 
             foreach (ZennoLab.CommandCenter.HtmlElement child in hardware)
@@ -87,6 +87,7 @@ namespace z3nCore
                 {
                     try { varValue = text.Split('\n')[2]; } catch { Thread.Sleep(2000); continue; }
                     var upd = $"{varName} = '{varValue}'";
+                    stats.Add(varName, varValue);
                     //upd = QuoteColumnNames(upd);
                     _project.DbUpd(upd, tableName);
                 }
@@ -105,11 +106,12 @@ namespace z3nCore
                     if (varName == "TimeFromIP") timezoneOffset = varValue;
                     if (varName == "TimeZoneBasedonIP") timezoneName = varValue;
                     var upd = $"{varName} = '{varValue}'";
+                    stats.Add(varName, varValue);
                     //upd = QuoteColumnNames(upd);
                     _project.DbUpd(upd, tableName);
                 }
             }
-
+            return stats;
 
         }
 
@@ -120,6 +122,21 @@ namespace z3nCore
             var score = heToWait.Split(' ')[3].Split('\n')[0]; var problems = "";
             if (!score.Contains("100%"))
             {
+                var probDic = Problems();
+                problems = string.Join(" ,", probDic.Keys); 
+            }
+            score = $"[{score}] {problems}";
+            return score;
+        }
+        
+        public Dictionary<string,string> Problems()
+        {
+            LoadStats();
+            var prblems = new Dictionary<string, string>();
+            string heToWait = _instance.HeGet(("anchor_progress", "id"));
+            var score = heToWait.Split(' ')[3].Split('\n')[0]; ;
+            if (!score.Contains("100%"))
+            {
                 var problemsHe = _instance.ActiveTab.FindElementByAttribute("ul", "fulltagname", "ul", "regexp", 5).GetChildren(false);
                 foreach (ZennoLab.CommandCenter.HtmlElement child in problemsHe)
                 {
@@ -128,15 +145,13 @@ namespace z3nCore
                     var varName = text.Split('\n')[0];
                     try { varValue = text.Split('\n')[1]; } catch { continue; }
                     ;
-                    problems += $"{varName}: {varValue}; ";
+                    prblems.Add(varName, varValue);
                 }
-                problems = problems.Trim();
-
             }
-            score = $"[{score}] {problems}";
-            return score;
+            return prblems;
         }
-        public void FixTime()
+        
+        public string FixTime()
         {
             LoadStats();
             string timezoneOffset = "";
@@ -159,17 +174,30 @@ namespace z3nCore
                 }
             }
 
+            int appliedOffset = 0;
+            string appliedTimezoneName = timezoneName;
+
             var match = Regex.Match(timezoneOffset, @"GMT([+-]\d{2})");
             if (match.Success)
             {
-                int Offset = int.Parse(match.Groups[1].Value);
-                _logger.Send($"Setting timezone offset to: {Offset}");
+                appliedOffset = int.Parse(match.Groups[1].Value);
+                _logger.Send($"Setting timezone offset to: {appliedOffset}");
                 _instance.TimezoneWorkMode = ZennoLab.InterfacesLibrary.Enums.Browser.TimezoneMode.Emulate;
-                _instance.SetTimezone(Offset, 0);
+                _instance.SetTimezone(appliedOffset, 0);
             }
+    
             _instance.SetIanaTimezone(timezoneName);
-
+    
+            // Формируем JSON строку
+            var result = new
+            {
+                timezoneOffset = appliedOffset,
+                timezoneName = appliedTimezoneName,
+            };
+            return System.Text.Json.JsonSerializer.Serialize(result);
+            
         }
+        
 
     }
     public static partial class ProjectExtensions
