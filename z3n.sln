@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "z3n.Db", "z3n.Db\z3n.Db.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "z3n.Admin", "z3n.Admin\z3n.Admin.csproj", "{8BCF19AF-A026-4744-969F-8BEB082F3CD3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "z3n.Requests", "z3n.Requests\z3n.Requests.csproj", "{D12DC1E1-4817-40E8-B278-28AB59DDC2F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -84,5 +86,9 @@ Global
 		{8BCF19AF-A026-4744-969F-8BEB082F3CD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BCF19AF-A026-4744-969F-8BEB082F3CD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BCF19AF-A026-4744-969F-8BEB082F3CD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D12DC1E1-4817-40E8-B278-28AB59DDC2F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D12DC1E1-4817-40E8-B278-28AB59DDC2F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D12DC1E1-4817-40E8-B278-28AB59DDC2F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D12DC1E1-4817-40E8-B278-28AB59DDC2F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

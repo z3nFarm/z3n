@@ -24,9 +24,6 @@
             <Private>True</Private>
             <SpecificVersion>False</SpecificVersion>
         </Reference>
-        <Reference Include="ZennoLab.Emulation">
-            <HintPath>..\ZennoLab\ZennoLab.Emulation.dll</HintPath>
-        </Reference>
         <Reference Include="ZennoLab.InterfacesLibrary">
             <HintPath>W:\code_hard\.net\z3n\ZennoLab\ZennoLab.InterfacesLibrary.dll</HintPath>
             <Private>True</Private>
@@ -35,12 +32,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="NBitcoin" Version="7.0.6.0" />
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
         <PackageReference Include="Npgsql" Version="4.1.14" />
-        <PackageReference Include="System.Management" Version="10.0.2" />
-        <PackageReference Include="System.Net.Http" Version="4.3.4" />
+        
         <PackageReference Include="System.Data.Odbc" Version="8.0.0" />
 
         <!-- Costura с правильными настройками -->
@@ -54,7 +49,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\z3n.Core\z3n.Core.csproj" />
-      <ProjectReference Include="..\z3n.Web3\z3n.Web3.csproj" />
     </ItemGroup>
 
 

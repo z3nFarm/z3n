@@ -56,28 +56,28 @@ namespace z3nCore
             _fWrap = cfg.Contains("wrap");
             _fForce = cfg.Contains("force");
         }
-
-        private (bool acc, bool port, bool time, bool memory, bool caller, bool wrap, bool force) GetConfigFlags()
+        public Logger( bool log = false, string classEmoji = null, bool persistent = true, LogLevel logLevel = LogLevel.Info, string logHost = null, bool http = true, int timezoneOffset = -5)
         {
-            bool acc = false, port = false, time = false, memory = false, caller = false, wrap = false, force = false;
+            _project = null;
+            _logShow = log ;
+            _emoji = classEmoji;
+            _persistent = persistent;
+            _stopwatch = persistent ? Stopwatch.StartNew() : null;
+            _http = http;
+            _logHost =  "http://localhost:10993/log";
+            _timezone = timezoneOffset;
             
-            var flags = _project.Var("cfgLog").Split(',').Select(x => x.Trim()).ToList();
-            foreach (string flag in flags)
-            {
-                switch (flag)
-                {
-                    case "acc": acc = true; break;
-                    case "port": port = true; break;
-                    case "time": time = true; break;
-                    case "memory": memory = true; break;
-                    case "caller": caller = true; break;
-                    case "wrap": wrap = true; break;
-                    case "force": force = true; break;
-                }
-            }
             
-            return (acc, port, time, memory, caller, wrap, force);
+            //string cfg = _project.Var("cfgLog") ?? "";
+            _fAcc = false;//cfg.Contains("acc");
+            _fPort = false;//cfg.Contains("port");
+            _fTime = false;//cfg.Contains("time");
+            _fMem = false;//cfg.Contains("memory");
+            _fCaller = true;//cfg.Contains("caller");
+            _fWrap = true;//cfg.Contains("wrap");
+            _fForce = false;//cfg.Contains("force");
         }
+
 
         public void Send(object toLog,
             [CallerMemberName] string callerName = "",
@@ -102,19 +102,23 @@ namespace z3nCore
                 body = $"\n          {(!string.IsNullOrEmpty(_emoji) ? $"[ {_emoji} ] " : "")}{body.Trim()}";
             }
             
+            
             string toSend = header + body;
             if (toSend.Contains("!W")) type = LogType.Warning;
             if (toSend.Contains("!E")) type = LogType.Error;
-            Execute(toSend, type, color, toZp, thrw);
-            
-            if (_http)
+
+            if (_project != null)
             {
-                // Вытягиваем данные ДО отправки в поток, чтобы не обращаться к _project из фона
-                string prjName = _project.Name.Replace(".zp", "");
-                string acc =  _project.Var("acc0") ;
-                string port = _project.Var("port") ;
-                string pid = _project.Var("pid") ;
-                string sessionId = _project.Var("varSessionId");
+                Execute(toSend, type, color, toZp, thrw);
+            }
+            
+            if (_http && _project != null)
+            {
+                string prjName =  _project != null ? _project.Name.Replace(".zp", "") : "";
+                string acc = _project != null ?  _project.Var("acc0") : "";
+                string port = _project != null ? _project.Var("port"): "";
+                string pid = _project != null ? _project.Var("pid") : "";
+                string sessionId =  _project != null ?  _project.Var("varSessionId") : "";
                 SendToHttpLogger(body, type, callerName, prjName, acc, port, pid ,sessionId);
             }
         }
@@ -157,11 +161,13 @@ namespace z3nCore
         private string LogHeader(string callerName)
         {
             var sb = new StringBuilder();
-            if (_fAcc) sb.Append($"  🤖 [{_project.Var("acc0")}]");
-            if (_fTime) sb.Append($"  ⏱️ [{_project.Age<string>()}]");
-            if (_fPort) sb.Append($"  🔌 [{_project.Var("instancePort")}]");
+            if (_project != null)
+            {
+                if (_fAcc) sb.Append($"  🤖 [{_project.Var("acc0")}]");
+                if (_fTime) sb.Append($"  ⏱️ [{_project.Age<string>()}]");
+                if (_fPort) sb.Append($"  🔌 [{_project.Var("instancePort")}]");
+            }
             if (_fCaller) sb.Append($"  🔲 [{callerName}]");
-        
             return sb.ToString();
         }
         private string LogBody(string toLog, int cut)

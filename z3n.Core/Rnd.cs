@@ -175,36 +175,6 @@ namespace z3nCore
             }
             return fallback.Substring(0, Math.Min(fallback.Length, max));
         }
-        public static string RndInvite(this IZennoPosterProjectModel project, object limit = null, string inviteColumn = "refcode", bool log = false)
-        {
-            string refCode = project.Variables["cfgRefCode"].Value;
-
-            if (string.IsNullOrEmpty(refCode))
-            {
-                string whereClause = $"TRIM({inviteColumn}) != ''";
-    
-                if (limit != null)
-                {
-                    string parsedLimit = limit.ToString();
-                    if (int.TryParse(parsedLimit, out int limitValue) && limitValue > 0)
-                    {
-                        whereClause += $" AND id <= {limitValue}";
-                    }
-                    else
-                    {
-                        project.SendErrorToLog($"Invalid limit. {limit}", log);
-                        throw new Exception($"Invalid limit. {limit}");
-                    }
-                }
-    
-                whereClause += " ORDER BY RANDOM() LIMIT 1";
-                refCode = project.SqlGet(inviteColumn, log: log, where: whereClause);
-                project.Variables["cfgRefCode"].Value = refCode;
-            }
-
-            
-            return refCode;
-        }
         public static double RndPercent(decimal input, double percent, double maxPercent)
         {
             if (percent < 0 || maxPercent < 0 || percent > 100 || maxPercent > 100)

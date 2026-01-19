@@ -8,14 +8,23 @@
     
     <ItemGroup>
         <Compile Remove="ZennoLab\**" />
+        <Compile Remove="Sql\DbExtencions.cs" />
+        <Compile Remove="Sql\Db.cs" />
+        <Compile Remove="Sql\DbZenno.cs" />
+        <Compile Remove="Sql\ProcessManager.cs" />
+        <Compile Remove="Sql\Sql.cs" />
+        <Compile Remove="Sql\TaskManager.cs" />
+        <Compile Remove="Sql\**" />
     </ItemGroup>
 
     <ItemGroup>
         <EmbeddedResource Remove="ZennoLab\**" />
+        <EmbeddedResource Remove="Sql\**" />
     </ItemGroup>
 
     <ItemGroup>
         <None Remove="ZennoLab\**" />
+        <None Remove="Sql\**" />
     </ItemGroup>
 
     <ItemGroup>

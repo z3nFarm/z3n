@@ -9,6 +9,8 @@
     
     <ItemGroup>
       <ProjectReference Include="..\z3n.Core\z3n.Core.csproj" />
+      <ProjectReference Include="..\z3n.Db\z3n.Db.csproj" />
+      <ProjectReference Include="..\z3n.Requests\z3n.Requests.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -36,6 +38,10 @@
         <PackageReference Include="Fody" Version="6.8.0">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="DbBuilder.cs" />
     </ItemGroup>
 
     

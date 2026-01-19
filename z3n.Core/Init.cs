@@ -99,42 +99,7 @@ namespace z3nCore
         }
         
         #endregion
-
-        #region Filters & Validation
-
-       
-
-        private void SocialFilter()
-        {
-            if (string.IsNullOrEmpty(_project.Var("requiredSocial"))) return;
-            
-            var requiredSocials = _project.Var("requiredSocial").Split(',').ToList();
-            var badList = new List<string>{
-                "suspended",
-                "restricted",
-                "ban",
-                "CAPTCHA",
-                "applied",
-                "Verify"};
-            
-            foreach (var social in requiredSocials)
-            {
-                var tableName = "_" + social.ToLower().Trim();
-                var status = _project.SqlGet("status", tableName, log: true);
-                foreach (string word in badList)
-                {
-                    if (status.Contains(word))
-                    {
-                        string exMsg = $"Social filter failed: social={social}, acc={_project.Var("acc0")}, status={status}";
-                        _logger.Warn(exMsg);
-                        throw new Exception(exMsg);
-                    }
-                }
-            }
-        }
         
-        #endregion
-
         #region Utilities & Helpers
 
         private string[] GetVersions()

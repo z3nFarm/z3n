@@ -58,16 +58,7 @@ namespace z3nCore
         
         internal static readonly Regex ValidNamePattern = new Regex(@"^[a-zA-Z_][a-zA-Z0-9_]*$", RegexOptions.Compiled);
         
-        internal static string ValidateName(string name, string paramName)
-        {
-            if (string.IsNullOrEmpty(name))
-                throw new ArgumentException($"{paramName} cannot be null or empty");
-
-            if (!ValidNamePattern.IsMatch(name))
-                throw new ArgumentException($"Invalid {paramName}: {name}. Only alphanumeric characters and underscores are allowed.");
-
-            return name;
-        }
+       
         
         internal static bool IsValidRange(string range)
         {
@@ -1056,7 +1047,6 @@ namespace z3nCore
         public static void ClmnRearrange(this IZennoPosterProjectModel project, Dictionary<string, string> tableStructure, string tblName = null, bool log = false)
         {
             tblName =  project.TableName(tblName);
-            DbHelpers.ValidateName(tblName, "table name");
             
             bool _pstgr = project.Var("DBmode") == "PostgreSQL";
             string quotedTable = DbHelpers.Quote(tblName);
@@ -1321,8 +1311,7 @@ namespace z3nCore
     {
         public static void MigrateTable(this IZennoPosterProjectModel project, string source, string dest)
         {
-            DbHelpers.ValidateName(source, "source table");
-            DbHelpers.ValidateName(dest, "destination table");
+
             project.SendInfoToLog($"{source} -> {dest}", true);
             project.TableCopy(source, dest);
             try { project.DbQ($"ALTER TABLE {DbHelpers.Quote(dest)} RENAME COLUMN {DbHelpers.Quote("acc0")} to {DbHelpers.Quote("id")}"); } catch { }
