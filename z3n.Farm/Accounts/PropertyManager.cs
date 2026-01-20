@@ -50,14 +50,7 @@ namespace z3nCore.Utilities
                     var prop = type.GetProperty(column);
                     var value = prop.GetValue(obj, null); 
                     string valueStr = value != null ? value.ToString() : string.Empty;
-                    valueStr = System.Text.RegularExpressions.Regex.Replace(
-                        valueStr, 
-                        @"\\*""+|""+\\*", 
-                        "\""
-                    );
                     valueStr = valueStr.Replace("'", "''");
-                    // берем из переданного объекта
-                    //string valueStr = value != null ? value.ToString().Replace("'", "''") : string.Empty;
                     data.Add(column, valueStr);
                 }
                 catch

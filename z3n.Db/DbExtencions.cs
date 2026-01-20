@@ -207,7 +207,8 @@ namespace z3nCore
             
             foreach(var p in dataDic)
             {
-                updString.Append($"{p.Key} = '{p.Value.Replace("'","")}',");
+                string escapedValue = p.Value.Replace("'", "''");
+                updString.Append($"{p.Key} = '{escapedValue}',");
             }
             project.DbUpd(updString.ToString().Trim(','), tableName, log, thrw, where:where, saveToVar : "");
         }
