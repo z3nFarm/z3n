@@ -428,6 +428,43 @@ namespace z3nCore
                 return $"Error: {ex.Message}";
             }
         }
+        public static void JsClick(this Instance instance, int x, int y)
+        {
+            string js = $@"
+                (function() {{
+                    var canvas = document.querySelector('canvas');
+                    if (!canvas) return 'no canvas';
+                    
+                    var rect = canvas.getBoundingClientRect();
+                    var x = {x};
+                    var y = {y};
+                    
+                    var events = ['mousedown', 'mouseup', 'click'];
+                    events.forEach(function(eventType) {{
+                        var evt = new MouseEvent(eventType, {{
+                            view: window,
+                            bubbles: true,
+                            cancelable: true,
+                            clientX: x,
+                            clientY: y,
+                            screenX: x,
+                            screenY: y,
+                            button: 0
+                        }});
+                        canvas.dispatchEvent(evt);
+                    }});
+                    
+                    return 'clicked at ' + x + ',' + y;
+                }})();
+                ";
+
+            instance.ActiveTab.MainDocument.EvaluateScript(js);
+
+        }
+        public static void JsClick(this Instance instance, int[] pos)
+        {
+            instance.JsClick(pos[0], pos[1]);
+        }
         
         public static string JsSet(this Instance instance, string selector, string value, double delayX = 1.0)
         {
@@ -503,6 +540,8 @@ namespace z3nCore
                 return $"{ex.Message}";
             }
         }
+        
+        
         
         #endregion
         

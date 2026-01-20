@@ -36,10 +36,10 @@ namespace z3nCore.Utilities
         #endregion
 
         #region Constructor
-        public Git(IZennoPosterProjectModel project, string token, string username, string branch = "master", string organization = null)
+        public Git(IZennoPosterProjectModel project, string token, string username, string branch = "master", string organization = null, bool log = false)
         {
             _project = project ?? throw new ArgumentNullException(nameof(project));
-            _log = new Logger(_project, true);
+            _log = new Logger(_project, log);
             
             if (string.IsNullOrWhiteSpace(token) || !token.StartsWith("ghp_"))
                 throw new ArgumentException("Invalid GitHub token. Must start with 'ghp_'", nameof(token));
@@ -51,10 +51,11 @@ namespace z3nCore.Utilities
             _organization = organization;
             _branch = branch;
             
+
             _db = new Db(project, dbMode: "PostgreSQL", 
                 pgHost: "localhost", pgPort: "5432", pgDbName: "postgres", 
                 pgUser: "postgres", pgPass: project.Var("DBpstgrPass"), 
-                defaultTable: _gitTable
+                defaultTable: _gitTable , log:log
             );
             
             _gitCli = new GitCli(_log, token, username, organization, branch);
