@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Newtonsoft.Json;
 using ZennoLab.CommandCenter;
 using ZennoLab.InterfacesLibrary.ProjectModel;
 namespace z3nCore
@@ -131,7 +132,7 @@ namespace z3nCore
             
                 if (!_instance.ActiveTab.FindElementByAttribute("span", "innertext", "Continue\\ in\\ Browser", "regexp", 0).IsVoid) 
                     state = "appDetected";
-                else if (!_instance.ActiveTab.FindElementByAttribute("section", "aria-label", "User\\ area", "regexp", 0).IsVoid) 
+                else if (!_instance.ActiveTab.FindElementByAttribute("section", "aria-label", "User", "regexp", 0).IsVoid) 
                     state = "logged";
                 else if (!_instance.ActiveTab.FindElementByAttribute("div", "innertext", "Are\\ you\\ human\\?", "regexp", 0).IsVoid) 
                     state = "capctha";
@@ -186,39 +187,6 @@ namespace z3nCore
         #endregion
         #region Stats & Info UI
         
-        public List<string> Servers(bool toDb = false, bool log = false)
-        {
-            _instance.UseFullMouseEmulation = true;
-            var folders = new List<HtmlElement>();
-            var servers = new List<string>();
-            var list = _instance.ActiveTab.FindElementByAttribute("div", "aria-label", "Servers", "regexp", 0).GetChildren(false).ToList();
-            
-            foreach (HtmlElement item in list)
-            {
-                if (item.GetAttribute("class").Contains("listItem"))
-                {
-                    var server = item.FindChildByTag("div", 1).FirstChild.GetAttribute("data-dnd-name");
-                    servers.Add(server);
-                }
-
-                if (item.GetAttribute("class").Contains("wrapper"))
-                {
-                    _instance.HeClick(item);
-                    var FolderServer = item.FindChildByTag("ul", 0).GetChildren(false).ToList();
-                    foreach (HtmlElement itemInFolder in FolderServer)
-                    {
-                        var server = itemInFolder.FindChildByTag("div", 1).FirstChild.GetAttribute("data-dnd-name");
-                        servers.Add(server);
-                    }
-                }
-            }
-
-            string result = string.Join("\n", servers);
-            _log.Send($"Servers found: count={servers.Count}, inFolders={folders.Count}, toDb={toDb}\n[{string.Join(", ", servers)}]");
-            
-            if(toDb) _project.DbUpd($"servers = '{result}'", "__discord");
-            return servers;
-        }
         public List<string> GetRoles(string gmChannelLink, string gmMessage = "gm", bool log = false)
         {
             _idle.Sleep();
@@ -401,7 +369,7 @@ namespace z3nCore
             return namedRoles;
         }
         
-        public Dictionary<string, string> GetServers(string guildId)
+        public Dictionary<string, string> GetServers(bool toDb = false)
         {
             _idle.Sleep();
             string response = _project.GET("https://discord.com/api/v9/users/@me/guilds", "+",BuildHeaders(), parse:true);
@@ -416,11 +384,18 @@ namespace z3nCore
                 var name = json[i].name;
                 servers.Add(id,name);
             }
+
+            if (toDb)
+            {
+                string jsonString = JsonConvert.SerializeObject(servers, Formatting.Indented);
+                _project.DbUpd($"servers = '{jsonString}'", tableName: "_discord");
+            }
+
             return servers;
+            
+            
         }
-
-
-
+        
 
         #endregion
         

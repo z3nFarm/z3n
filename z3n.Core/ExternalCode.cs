@@ -40,7 +40,7 @@ namespace z3nCore
                 "acc0", "cfgLog", "cfgPin",
                 "DBmode", "DBpstgrPass", "DBpstgrUser", "DBsqltPath",          
                 "instancePort",  "lastQuery",
-                "projectScript", "varSessionId", "wkMode",
+                "varSessionId", "wkMode",
             };
             
             

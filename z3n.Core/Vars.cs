@@ -365,24 +365,23 @@ namespace z3nCore
 
         public static string ProjectName(this IZennoPosterProjectModel project)
         {
-            var path = project.Var("projectScript");
+            var path = "";
     
-            if (string.IsNullOrEmpty(path))
+
+            var pathToFolder = project.Path;
+            var filename = project.Name;
+    
+            var actualFiles = Directory.GetFiles(pathToFolder, filename, SearchOption.TopDirectoryOnly);
+    
+            if (actualFiles.Length > 0)
             {
-                var pathToFolder = project.Path;
-                var filename = project.Name;
-        
-                var actualFiles = Directory.GetFiles(pathToFolder, filename, SearchOption.TopDirectoryOnly);
-        
-                if (actualFiles.Length > 0)
-                {
-                    path = Path.GetFileName(actualFiles[0]); 
-                }
-                else
-                {
-                    path = project.Name; 
-                }
+                path = Path.GetFileName(actualFiles[0]); 
             }
+            else
+            {
+                path = project.Name; 
+            }
+            
     
             string name = ProjectName(path);
             project.Var("projectName", name);

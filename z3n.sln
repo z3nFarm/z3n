@@ -20,8 +20,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zaffier", "_projects\Zaffie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClashOfCoins", "_projects\ClashOfCoins\ClashOfCoins.csproj", "{F87390D2-1667-4E93-ABE5-839145D481C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "z3nTray", "z3nTray\z3nTray\z3nTray.csproj", "{E0ADF7A8-6A68-4656-880F-AA40277342A9}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "z3n.Db", "z3n.Db\z3n.Db.csproj", "{A08203E1-E7B6-443E-8F52-2E2C816BA04E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "z3n.Admin", "z3n.Admin\z3n.Admin.csproj", "{8BCF19AF-A026-4744-969F-8BEB082F3CD3}"
@@ -35,6 +33,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zeko", "_projects\Zeko\Zeko.csproj", "{3106D5EE-6E0B-424D-BE8C-07B5A619B95F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZkNoid", "_projects\ZkNoid\ZkNoid.csproj", "{248C1C85-26D3-4A63-AE6D-E83555F2509E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "z3n.Test", "z3n.Test\z3n.Test.csproj", "{406249C9-9284-4467-B0B3-CC9102C9294A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -82,10 +82,6 @@ Global
 		{F87390D2-1667-4E93-ABE5-839145D481C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F87390D2-1667-4E93-ABE5-839145D481C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F87390D2-1667-4E93-ABE5-839145D481C1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E0ADF7A8-6A68-4656-880F-AA40277342A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E0ADF7A8-6A68-4656-880F-AA40277342A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E0ADF7A8-6A68-4656-880F-AA40277342A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E0ADF7A8-6A68-4656-880F-AA40277342A9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A08203E1-E7B6-443E-8F52-2E2C816BA04E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A08203E1-E7B6-443E-8F52-2E2C816BA04E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A08203E1-E7B6-443E-8F52-2E2C816BA04E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -114,5 +110,9 @@ Global
 		{248C1C85-26D3-4A63-AE6D-E83555F2509E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{248C1C85-26D3-4A63-AE6D-E83555F2509E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{248C1C85-26D3-4A63-AE6D-E83555F2509E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{406249C9-9284-4467-B0B3-CC9102C9294A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{406249C9-9284-4467-B0B3-CC9102C9294A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{406249C9-9284-4467-B0B3-CC9102C9294A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{406249C9-9284-4467-B0B3-CC9102C9294A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

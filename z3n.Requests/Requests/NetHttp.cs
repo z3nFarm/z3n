@@ -25,14 +25,11 @@ namespace z3nCore
         private readonly Logger _logger;
         private readonly bool _logShow;
 
-        // ✅ ИСПРАВЛЕНИЕ #1: Singleton HttpClient для запросов без proxy
         private static readonly HttpClient _defaultClient = new HttpClient();
 
-        // ✅ ИСПРАВЛЕНИЕ #2: Кеш клиентов с proxy (ключ = proxy string)
         private static readonly ConcurrentDictionary<string, HttpClient> _proxyClients
             = new ConcurrentDictionary<string, HttpClient>();
 
-        // ✅ ИСПРАВЛЕНИЕ #3: Ограничение размера кеша proxy клиентов
         private const int MAX_PROXY_CLIENTS = 100;
 
         static NetHttpAsync()
@@ -68,9 +65,7 @@ namespace z3nCore
             }
         }
 
-        /// <summary>
-        /// ✅ ИСПРАВЛЕНО: Получает или создает HttpClient для указанного proxy
-        /// </summary>
+
         private HttpClient GetHttpClient(string proxyString, int deadline)
         {
             if (string.IsNullOrEmpty(proxyString))
@@ -94,9 +89,7 @@ namespace z3nCore
             });
         }
 
-        /// <summary>
-        /// Создает HttpClient с указанным proxy
-        /// </summary>
+
         private HttpClient CreateProxyClient(string proxyString)
         {
             WebProxy proxy = ParseProxy(proxyString);
@@ -166,9 +159,7 @@ namespace z3nCore
             return restrictedHeaders.Contains(headerName);
         }
 
-        /// <summary>
-        /// ✅ ИСПРАВЛЕНО: ASYNC GET запрос с переиспользованием HttpClient
-        /// </summary>
+
         public async Task<string> GetAsync(
             string url,
             string proxyString = "",
@@ -286,9 +277,7 @@ namespace z3nCore
             }
         }
 
-        /// <summary>
-        /// ✅ ИСПРАВЛЕНО: ASYNC POST запрос с переиспользованием HttpClient
-        /// </summary>
+
         public async Task<string> PostAsync(
             string url,
             string body,
@@ -383,12 +372,7 @@ namespace z3nCore
             }
         }
 
-        /// <summary>
-        /// ✅ ИСПРАВЛЕНО: ASYNC PUT запрос
-        /// </summary>
-/// <summary>
-/// ✅ ИСПРАВЛЕНО: ASYNC PUT запрос
-/// </summary>
+
         public async Task<string> PutAsync(
             string url,
             string body = "",
@@ -492,9 +476,7 @@ namespace z3nCore
             }
         }
 
-        /// <summary>
-        /// ✅ ИСПРАВЛЕНО: ASYNC DELETE запрос
-        /// </summary>
+
         public async Task<string> DeleteAsync(
             string url,
             string proxyString = "",
@@ -597,10 +579,7 @@ namespace z3nCore
             return mergedHeaders;
         }
 
-        /// <summary>
-        /// ✅ ДОПОЛНИТЕЛЬНО: Метод для очистки кеша proxy клиентов
-        /// Вызывайте периодически если используется много разных proxy
-        /// </summary>
+
         public static void ClearProxyCache()
         {
             var oldClients = _proxyClients.ToArray();

@@ -1,10 +1,11 @@
 {
   "_addresses": [
     "id",
-    "evm_pk",
+    "evm",
     "sol",
-    "apt",
     "sui",
+    "evm_pk",
+    "apt",
     "osmo",
     "xion",
     "ton",
@@ -47,6 +48,9 @@
   ],
   "_deposits": [
     "id",
+    "okx_evm",
+    "bitget_evm",
+    "binance_evm",
     "okx_eth",
     "bitget_xion",
     "bitget_eth"
@@ -77,7 +81,8 @@
     "authenticator_types_0",
     "age_verification_status",
     "_id",
-    "daily"
+    "daily",
+    "servers"
   ],
   "_github": [
     "id",
@@ -330,6 +335,30 @@
     "username",
     "tgid",
     "name"
+  ],
+  "_treasury": [
+    "id",
+    "Ethereum",
+    "Optimism",
+    "BSC",
+    "Unichain",
+    "Polygon",
+    "Monad",
+    "opBNB",
+    "zkSync",
+    "Metis",
+    "Soneium",
+    "Mantle",
+    "Base",
+    "Mode",
+    "Arbitrum",
+    "Celo",
+    "Avalanche",
+    "Linea",
+    "Blast",
+    "Scroll",
+    "HyperEVM",
+    "Gnosis"
   ],
   "_twitter": [
     "id",
@@ -722,7 +751,9 @@
     "NavigatorPermissions",
     "SpeechSynthesisVoices",
     "DevicePixelRatio",
-    "NavigateErrorCountRunning"
+    "NavigateErrorCountRunning",
+    "status",
+    "last"
   ],
   "zb_profile": [
     "zb_id",
@@ -775,7 +806,9 @@
     "ScreenLeft",
     "ScreenTop",
     "ScreenSizeHeight",
-    "ScreenSizeWidth"
+    "ScreenSizeWidth",
+    "status",
+    "last"
   ],
   "zpprofile_instance": [
     "id",

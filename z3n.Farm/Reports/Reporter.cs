@@ -19,7 +19,6 @@ namespace z3nCore
 
         private readonly IZennoPosterProjectModel _project;
         private readonly Instance _instance;
-        private readonly string _projectScript;
         private readonly object _lockObject = new object();
         private readonly string _ts;
         private readonly int _completionTime;
@@ -29,7 +28,6 @@ namespace z3nCore
         {
             _project = project ?? throw new ArgumentNullException(nameof(project));
             _instance = instance ?? throw new ArgumentNullException(nameof(instance));
-            _projectScript = project.Var("projectScript");
             _ts = $"{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ss.fffZ}";
             _completionTime = _project.TimeElapsed();
         }
@@ -148,7 +146,7 @@ namespace z3nCore
         {
             return new SuccessData
             {
-                Script = Path.GetFileName(_projectScript),
+                Script = "",
                 Account = _project.Var("acc0"),
                 LastQuery = _project.Var("lastQuery"),
                 ElapsedTime = _project.TimeElapsed(),
@@ -197,7 +195,7 @@ namespace z3nCore
         private string FormatErrorForTelegram(ErrorData data)
         {
             var sb = new StringBuilder();
-            string script = Path.GetFileName(_projectScript).EscapeMarkdown();
+            string script = "";
 
             sb.AppendLine($"⛔️\\#fail  \\#acc{data.Account}  \\#{script}");
             

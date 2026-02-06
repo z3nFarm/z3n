@@ -229,15 +229,12 @@ namespace z3nCore
 
     public static class DbJson
     {
-        public static void JsonToDb(this IZennoPosterProjectModel project, string json, string tableName = null, bool log = false, bool thrw = false, string where = "")
+        public static void JsonToDb(this IZennoPosterProjectModel project, string json, string tableName = null, bool log = false, bool thrw = false, string where = "",bool saveStructure = false)
         {
             tableName = project.TableName(tableName);
-    
             var structure = ExtractStructure(json);
-    
             var dataDic = json.JsonToDic(true);
-            dataDic["_json_structure"] = structure; 
-    
+            if (saveStructure) dataDic["_json_structure"] = structure; 
             project.DicToDb(dataDic, tableName, log, thrw,where:where);
         }
         private static string ExtractStructure(string json)
