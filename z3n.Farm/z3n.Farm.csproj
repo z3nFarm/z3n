@@ -9,6 +9,7 @@
     
     <ItemGroup>
       <ProjectReference Include="..\z3n.Core\z3n.Core.csproj" />
+        <ProjectReference Include="..\z3n.Browser\z3n.Browser.csproj" />
       <ProjectReference Include="..\z3n.Db\z3n.Db.csproj" />
       <ProjectReference Include="..\z3n.Requests\z3n.Requests.csproj" />
     </ItemGroup>
@@ -42,6 +43,10 @@
 
     <ItemGroup>
       <Compile Remove="DbBuilder.cs" />
+      <Compile Remove="Browser\BrowserScan.cs" />
+      <Compile Remove="Browser\InstanceExtencions.cs" />
+      <Compile Remove="Browser\Canvas.cs" />
+      <Compile Remove="Browser\HtmlExtensions.cs" />
     </ItemGroup>
 
     

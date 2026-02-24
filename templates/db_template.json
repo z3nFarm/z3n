@@ -358,7 +358,8 @@
     "Blast",
     "Scroll",
     "HyperEVM",
-    "Gnosis"
+    "Gnosis",
+    "OP Mainnet"
   ],
   "_twitter": [
     "id",
@@ -400,6 +401,20 @@
   ],
   "_|_____________________________________________": [
     "id"
+  ],
+  "autoZ3N": [
+    "id",
+    "lock_name",
+    "lock_address",
+    "token_id",
+    "owner",
+    "expired",
+    "expiration",
+    "github",
+    "telegram",
+    "email",
+    "status",
+    "last"
   ],
   "folder_instance": [
     "id",
@@ -476,7 +491,8 @@
     "CanvasMissMode",
     "daily",
     "quests",
-    "useAllLimits"
+    "useAllLimits",
+    "WsConnectionString"
   ],
   "folder_profile": [
     "id",

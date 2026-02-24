@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net48;</TargetFrameworks>
+        <UseWindowsForms>true</UseWindowsForms>
+        <RootNamespace>z3n</RootNamespace>
+    </PropertyGroup>
+
+
+    <ItemGroup>
+        <ProjectReference Include="..\z3n.Db\z3n.Db.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="ZennoLab.CommandCenter">
+            <HintPath>..\ZennoLab\ZennoLab.CommandCenter.dll</HintPath>
+        </Reference>
+        <Reference Include="ZennoLab.Emulation">
+            <HintPath>..\ZennoLab\ZennoLab.Emulation.dll</HintPath>
+        </Reference>
+        <Reference Include="ZennoLab.InterfacesLibrary">
+            <HintPath>..\ZennoLab\ZennoLab.InterfacesLibrary.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AForge.Imaging" Version="2.2.5" />
+        <PackageReference Include="Svg" Version="2.4.3" />
+        <PackageReference Include="ZXing.Net" Version="0.16.10" />
+    </ItemGroup>
+
+
+
+
+</Project>

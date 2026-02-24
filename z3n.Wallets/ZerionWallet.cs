@@ -28,8 +28,7 @@ namespace z3nCore
         private readonly string _urlOnboardingTab = "chrome-extension://klghhnkeealcohjjanjjdaeeggmfmlpl/popup.8e8f209b.html?windowType=tab&appMode=onboarding#/onboarding/import";
         private readonly string _urlPopup = "chrome-extension://klghhnkeealcohjjanjjdaeeggmfmlpl/popup.8e8f209b.html#";
         private readonly string _urlImport = "chrome-extension://klghhnkeealcohjjanjjdaeeggmfmlpl/popup.8e8f209b.html#/get-started/import";
-
-
+        
         public ZerionWallet(IZennoPosterProjectModel project, Instance instance, bool log = false, string key = null, string fileName = "Zerion1.21.3.crx")
         {
             _project = project;
@@ -41,8 +40,7 @@ namespace z3nCore
             _logger = new Logger(project, log: log, classEmoji: "🇿");
 
         }
-
-
+        
         private string KeyLoad(string key)
         {
             if (string.IsNullOrEmpty(key)) key = "key";

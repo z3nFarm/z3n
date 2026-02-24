@@ -126,6 +126,7 @@ namespace z3nCore
 
             try
             {
+                
                 dynamic result = Newtonsoft.Json.JsonConvert.DeserializeObject(response);
 
                 if (result.error != null)
@@ -183,7 +184,7 @@ namespace z3nCore
             }
             catch (Exception ex)
             {
-                _logger.Send($"!W Failed to parse RPC response for {method}: {ex.Message}");
+                _logger.Send($"!W Failed to parse RPC response for {method}: {response}\n {ex.Message}");
                 throw new Exception($"Failed to parse RPC response for {method}: {ex.Message}", ex);
             }
         }

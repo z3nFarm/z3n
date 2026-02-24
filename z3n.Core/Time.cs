@@ -85,6 +85,10 @@ namespace z3nCore
             {
                 t = t.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
             }
+            else if (input is string s && s == "nextH")
+            {
+                t  = new DateTime(t.Year, t.Month, t.Day, t.Hour, 0, 0).AddHours(1).AddMinutes(1);
+            }
             else if (input is decimal || input is int)
             {
                 decimal minutes = Convert.ToDecimal(input);

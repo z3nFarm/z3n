@@ -12,7 +12,7 @@ using System.Net.Http;
 using Nethereum.Signer;
 namespace z3nCore
 {
-    public class Unlock
+    public class Unlock_
     {
         private readonly string _privateKey; // Добавь в конструктор
 
@@ -68,7 +68,7 @@ namespace z3nCore
         private string _bearerToken;
 
 
-        public Unlock(IZennoPosterProjectModel project, bool log = false,string privateKey = null)
+        public Unlock_(IZennoPosterProjectModel project, bool log = false,string privateKey = null)
         {
             _project = project;
             _jsonRpc = Rpc.Base;
@@ -141,75 +141,88 @@ namespace z3nCore
             }
         }
         
-       public void CollectSubscribersToDb(int chainId, string lockAddress, int maxTokenId, string privateKey, string tableName = "___z3nFarm")
+        public void CollectSubscribersToDb(int chainId, string[] locks, int maxTokenId, string privateKey, string tableName)
         {
             // Login first
             Login(privateKey);
             
             long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
-            for (int tokenId = 1; tokenId <= maxTokenId; tokenId++)
+            
+            int dbIndex = 1;
+            
+            foreach (string lockAddress in locks)
             {
-                _project.Var("acc0", tokenId);
+                _logger.Send($"Processing lock: {lockAddress}");
                 
-                try
+                for (int tokenId = 1; tokenId <= maxTokenId; tokenId++)
                 {
-                    string json = GetKeyMetadataAuthenticated(chainId, lockAddress, tokenId);
-                    _logger.Send(json);
                     
-                    var data = JObject.Parse(json);
-
-                    string owner = data["owner"]?.ToString();
-                    if (string.IsNullOrEmpty(owner))
-                    {
-                        _logger.Send($"Token {tokenId}: no owner, stopping");
-                        break;
-                    }
-
-                    // Безопасное извлечение всех полей с fallback на пустую строку
-                    long expiration = long.Parse(data["expiration"]?.ToString() ?? "0");
-                    string github = data["userMetadata"]?["protected"]?["github"]?.ToString() ?? "";
-                    string email = data["userMetadata"]?["protected"]?["email"]?.ToString() ?? "";
-                    bool expired = expiration <= now;
-                    
-                    var d = new Dictionary<string, string>
-                    {
-                        { "token_id", tokenId.ToString() },
-                        { "owner", owner },
-                        { "expired", expired.ToString() },
-                        { "expiration", expiration.ToString() },
-                        { "github", github },
-                        { "email", email }
-                    };
-                    
-                    _project.DicToDb(d, log: true);
-                    _logger.Send($"Token {tokenId}: saved (github={github}, expired={expired})");
-                }
-                catch (Exception ex)
-                {
-                    _logger.Send($"!W Token {tokenId}: {ex.Message}");
-                    // Сохранить хотя бы token_id с ошибкой
                     try
                     {
-                        var errorDic = new Dictionary<string, string>
+                        string json = GetKeyMetadataAuthenticated(chainId, lockAddress, tokenId);
+                        _logger.Send(json);
+                        var data = JObject.Parse(json);
+                        string owner = data["owner"]?.ToString();
+                        if (string.IsNullOrEmpty(owner))
                         {
+                            _logger.Send($"Lock {lockAddress}, Token {tokenId}: no owner, stopping");
+                            break;
+                        }
+                        // Безопасное извлечение всех полей с fallback на пустую строку
+                        long expiration = long.Parse(data["expiration"]?.ToString() ?? "0");
+                        string github = data["userMetadata"]?["protected"]?["github"]?.ToString() ?? "";
+                        string email = data["userMetadata"]?["protected"]?["email"]?.ToString() ?? "";
+                        string telegram = data["userMetadata"]?["protected"]?["telegram"]?.ToString() ?? "";
+                        string lockName = data["name"]?.ToString() ?? "";
+
+                        bool expired = expiration <= now;
+                        
+                        var d = new Dictionary<string, string>
+                        {
+                            { "lock_address", lockAddress },
+                            { "lock_name", lockName },
                             { "token_id", tokenId.ToString() },
-                            { "owner", "" },
-                            { "expired", "" },
-                            { "expiration", "0" },
-                            { "github", "" },
-                            { "email", "" }
+                            { "owner", owner },
+                            { "expired", expired.ToString() },
+                            { "expiration", expiration.ToString() },
+                            { "github", github },
+                            { "email", email },
+                            { "telegram", telegram }
                         };
-                        _project.DicToDb(errorDic,tableName, log: false);
+                        _project.DicToDb(d, tableName, log: true, where: $"id = {dbIndex}");
+                        _logger.Send($"Lock {lockAddress}, Token {tokenId}: saved (github={github}, expired={expired})");
+                        dbIndex++;
                     }
-                    catch { }
-                    
-                    // Не останавливаться на ошибке, продолжить
-                    continue;
+                    catch (Exception ex)
+                    {
+                        _logger.Send($"!W Lock {lockAddress}, Token {tokenId}: {ex.Message}");
+                        // Сохранить хотя бы token_id с ошибкой
+                        try
+                        {
+                            var errorDic = new Dictionary<string, string>
+                            {
+                                { "lock_address", lockAddress },
+                                { "token_id", tokenId.ToString() },
+                                { "owner", "" },
+                                { "expired", "" },
+                                { "expiration", "0" },
+                                { "github", "" },
+                                { "email", "" },
+                                { "telegram", "" }
+                            };
+                            _project.DicToDb(errorDic, tableName, log: false);
+                            
+                        }
+                        catch { }
+                        // Не останавливаться на ошибке, продолжить
+                        continue;
+                    }
                 }
+                
+                _logger.Send($"Completed lock {lockAddress}");
             }
             
-            _logger.Send($"Collected metadata for {maxTokenId} tokens");
+            _logger.Send($"Collected metadata for {locks.Length} locks with max {maxTokenId} tokens each");
         }
         public string ownerOf(string addressTo, int tokenId, bool decode = true)
         {
@@ -517,7 +530,7 @@ namespace z3nCore
         
         
         #region Sync
-        public Dictionary<string, string> GetActiveGitHubFromDb()
+        public Dictionary<string, string> GetActiveGitHubFromDb(string tableName)
         {
             var users = new Dictionary<string, string>(); 
             var _db = new Db(_project);
@@ -525,7 +538,7 @@ namespace z3nCore
             {
                 var activeRecords = _db.GetLines(
                     "owner, github", 
-                    tableName: "___z3nFarm", 
+                    tableName: tableName, 
                     where: "expired = 'False' AND github != ''",
                     log: true
                 );

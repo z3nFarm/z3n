@@ -228,11 +228,10 @@
         }
 
         .log-header {
-            display: flex;
-            gap: 8px;
+            display: grid;
+            grid-template-columns: 70px 100px 80px 50px 70px 70px 90px 250px 15px ;
+            gap: 6px;
             align-items: center;
-            white-space: nowrap;
-            flex-wrap: wrap;
         }
 
         .log-entry:hover {
@@ -273,7 +272,6 @@
             border-radius: 6px;
             font-size: 10px;
             font-weight: 500;
-            border: 1px solid rgba(163, 113, 247, 0.4);
             cursor: pointer;
         }
 
@@ -290,25 +288,21 @@
         .level.ERROR {
             background: rgba(248, 81, 73, 0.15);
             color: #ff7b72;
-            border: 1px solid rgba(248, 81, 73, 0.4);
         }
 
         .level.WARNING {
             background: rgba(210, 153, 34, 0.15);
             color: #f0883e;
-            border: 1px solid rgba(210, 153, 34, 0.4);
         }
 
         .level.INFO {
             background: rgba(56, 139, 253, 0.15);
             color: #79c0ff;
-            border: 1px solid rgba(56, 139, 253, 0.4);
         }
 
         .level.SUCCESS {
             background: rgba(63, 185, 80, 0.15);
             color: #56d364;
-            border: 1px solid rgba(63, 185, 80, 0.4);
         }
 
         .message {
@@ -321,11 +315,16 @@
             color: #c9d1d9;
             line-height: 1.5;
             font-size: 11px;
+            display: -webkit-box;
+            -webkit-line-clamp: 5;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .message:hover {
             background: rgba(110, 118, 129, 0.1);
             padding: 4px 6px;
+            -webkit-line-clamp: unset;
         }
 
         .session, .port, .pid {
@@ -504,6 +503,8 @@
                         <select id="logsSessionFilter" onchange="refreshLogs()"><option value="">Sessions</option></select>
                         <select id="logsPortFilter" onchange="refreshLogs()"><option value="">Ports</option></select>
                         <select id="logsPidFilter" onchange="refreshLogs()"><option value="">PIDs</option></select>
+                        <select id="logsAccountFilter" onchange="refreshLogs()"><option value="">All Accounts</option></select>
+
                         <input type="number" id="logsLimitInput" value="100" min="10" max="500" step="10" style="width: 60px;" onchange="refreshLogs()">
                     </div>
                 </div>
@@ -759,6 +760,7 @@ function clearHttpFilters() {
         const port = document.getElementById('logsPortFilter').value;
         const pid = document.getElementById('logsPidFilter').value;
         const limit = document.getElementById('logsLimitInput').value;
+        const account = document.getElementById('logsAccountFilter').value;
 
         let url = `${SERVER}/logs?limit=${limit}`;
         if (level) url += `&level=${level}`;
@@ -767,6 +769,7 @@ function clearHttpFilters() {
         if (session) url += `&session=${encodeURIComponent(session)}`;
         if (port) url += `&port=${encodeURIComponent(port)}`;
         if (pid) url += `&pid=${encodeURIComponent(pid)}`;
+        if (account) url += `&account=${encodeURIComponent(account)}`;
 
         try {
             const response = await fetch(url);
@@ -778,22 +781,42 @@ function clearHttpFilters() {
         }
     }
 
+    function formatSession(session) {
+        const sessionNum = parseInt(session);
+        if (isNaN(sessionNum) || sessionNum < 1000000000) return `${session}`;
+        
+        const timestamp = sessionNum > 9999999999 ? sessionNum : sessionNum * 1000;
+        const date = new Date(timestamp);
+        if (isNaN(date.getTime())) return `${session}`;
+        
+        const now = new Date();
+        const diff = now - date;
+        
+        if (diff < 86400000 && diff > 0) {
+            return `${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+        }
+        return `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+    }
+
     function renderLogs(logs) {
         const container = document.getElementById('logsContainer');
-        container.innerHTML = logs.map(log => {
-            const extraStr = log.extra ? JSON.stringify(log.extra) : '';
+        container.innerHTML = logs.map(log => {const extraStr = log.extra ? JSON.stringify(log.extra) : '';
             return `
                 <div class="log-entry ${log.level}">
                     <div class="log-header">
                         <span class="timestamp">${new Date(log.timestamp).toLocaleTimeString()}</span>
-                        <span class="machine" onclick="setLogsFilter('logsMachineFilter', '${log.machine}')">[${log.machine}]</span>
+                        <span class="machine" onclick="setLogsFilter('logsMachineFilter', '${log.machine}')">${log.machine}</span>
                         <span class="project" onclick="setLogsFilter('logsProjectFilter', '${log.project}')">${log.project}</span>
                         <span class="level ${log.level}" onclick="setLogsFilter('logsLevelFilter', '${log.level}')">${log.level}</span>
-                        <span class="account">${log.account}</span>
-                        <span style="color: #6e7681; font-size: 10px;">${extraStr}</span>
-                        <span class="session" onclick="setLogsFilter('logsSessionFilter', '${log.session}')">s:${log.session}</span>
-                        <span class="port" onclick="setLogsFilter('logsPortFilter', '${log.port}')">p:${log.port}</span>
+        
+                        
+                        <span class="session" onclick="setLogsFilter('logsSessionFilter', '${log.session}')" title="${log.session}">${formatSession(log.session)}</span>
                         <span class="pid" onclick="setLogsFilter('logsPidFilter', '${log.pid}')">pid:${log.pid}</span>
+                        <span class="port" onclick="setLogsFilter('logsPortFilter', '${log.port}')">port:${log.port}</span>
+
+                        <span style="color: #6e7681; font-size: 10px;">${extraStr}</span>
+                        <span class="account" onclick="setLogsFilter('logsAccountFilter', '${log.account}')">${log.account}</span>
+
                     </div>
                     <div class="message" onclick="copyToClipboard(this.innerText, this)" title="Click to copy">${escapeHtml(log.message)}</div>
                 </div>
@@ -811,12 +834,14 @@ function clearHttpFilters() {
             const sFilter = document.getElementById('logsSessionFilter');
             const portFilter = document.getElementById('logsPortFilter');
             const pidFilter = document.getElementById('logsPidFilter');
+            const accountFilter = document.getElementById('logsAccountFilter');
 
             const curM = mFilter.value;
             const curP = pFilter.value;
             const curS = sFilter.value;
             const curPort = portFilter.value;
             const curPid = pidFilter.value;
+            const curAccount = accountFilter.value;
 
             if (stats.byMachine) {
                 mFilter.innerHTML = '<option value="">All Machines</option>' +
@@ -841,6 +866,10 @@ function clearHttpFilters() {
                 pidFilter.innerHTML = '<option value="">PIDs</option>' +
                     pidKeys.map(p => `<option value="${p}" ${p === curPid ? 'selected' : ''}>${p}</option>`).join('');
             }
+            if (stats.byAccount) {
+                accountFilter.innerHTML = '<option value="">All Accounts</option>' +
+                    Object.keys(stats.byAccount).map(a => `<option value="${a}" ${a === curAccount ? 'selected' : ''}>${a}</option>`).join('');
+            }
         } catch (e) {
             console.error('Stats failed:', e);
         }
@@ -863,6 +892,7 @@ function clearHttpFilters() {
         document.getElementById('logsSessionFilter').value = '';
         document.getElementById('logsPortFilter').value = '';
         document.getElementById('logsPidFilter').value = '';
+        document.getElementById('logsAccountFilter').value = '';
         refreshLogs();
     }
 
@@ -958,6 +988,14 @@ function renderRequest() {
     const headers = r.headers || [];
     const cookies = r.cookies || r.Cookies || "";
     const body = r.body || "";
+
+    let formattedBody = body;
+    try {
+        const parsed = JSON.parse(body);
+        formattedBody = JSON.stringify(parsed, null, 2);
+    } catch (e) {
+        // Not JSON, use as-is
+    }
     
     // Парсим headers в таблицу
     const headersHtml = headers.map(h => {
@@ -984,9 +1022,9 @@ function renderRequest() {
         </div>
         ${cookies ? `<button class="copy-btn" onclick="copyText('${escapeForJs(cookies)}')">📋 Copy Cookies</button>` : ''}
         
-        <h4 style="margin-top: 16px;">Body:</h4>
-        <div class="code-block" style="min-height: 20px;">
-            ${body ? escapeHtml(body) : '<i style="color: #6e7681;">Empty body</i>'}
+         <h4 style="margin-top: 16px;">Body:</h4>
+        <div class="code-block" style="min-height: 20px; white-space: pre-wrap;">
+            ${formattedBody ? escapeHtml(formattedBody) : '<i style="color: #6e7681;">Empty body</i>'}
         </div>
         ${body ? `<button class="copy-btn" onclick="copyText('${escapeForJs(body)}')">📋 Copy Body</button>` : ''}
     `;
@@ -995,10 +1033,15 @@ function renderRequest() {
 function renderResponse() {
     if (!selectedRequest) return;
     const res = selectedRequest.response;
-    const headers = res.headers || '';
+    //const headers = res.headers || '';
     const body = res.body || '';
 
-    const headerLines = headers.split('\r\n').filter(h => h.trim());
+    let headerLines = [];
+    if (Array.isArray(res.headers)) {
+        headerLines = res.headers.filter(h => h && h.trim());
+    } else if (typeof res.headers === 'string') {
+        headerLines = res.headers.split('\r\n').filter(h => h.trim());
+    }
     
     const headersHtml = headerLines.map(h => {
         const colonIdx = h.indexOf(':');
@@ -1013,15 +1056,25 @@ function renderResponse() {
         `;
     }).join('');
 
-    document.getElementById('response').innerHTML = `
+    let formattedBody = body;
+    try {
+        const parsed = JSON.parse(body);
+        formattedBody = JSON.stringify(parsed, null, 2);
+    } catch (e) {
+        // Not JSON, use as-is
+    }
+
+        document.getElementById('response').innerHTML = `
         <h4>Headers:</h4>
         <div class="header-list">
-            ${headersHtml}
+            ${headersHtml || '<i style="color: #6e7681;">No headers</i>'}
         </div>
         
         <h4 style="margin-top: 16px;">Body:</h4>
-        <div class="code-block">${escapeHtml(body)}</div>
-        <button class="copy-btn" onclick="copyText('${escapeForJs(body)}')">📋 Copy Body</button>
+        <div class="code-block" style="min-height: 20px; white-space: pre-wrap;">
+            ${formattedBody ? escapeHtml(formattedBody) : '<i style="color: #6e7681;">Empty body</i>'}
+        </div>
+        ${body ? `<button class="copy-btn" onclick="copyText('${escapeForJs(body)}')">📋 Copy Body</button>` : ''}
     `;
 }
 

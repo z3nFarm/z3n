@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+<meta charset="UTF-8">
+<link rel="icon" href="https://avatars.githubusercontent.com/u/113336090?v=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>z3nJson</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@400;600;800&display=swap');
+
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1e28;
+    --border: #252a38;
+    --border2: #2e3447;
+    --text: #c8d0e8;
+    --text-dim: #5a6480;
+    --text-muted: #3a4060;
+    --accent: #4e9eff;
+    --accent-dim: #1e3a5f;
+    --green: #4ecca3;
+    --orange: #ffaa44;
+    --pink: #ff6b9d;
+    --purple: #a78bfa;
+    --yellow: #ffd566;
+    --red: #ff5566;
+    --key-color: #4e9eff;
+    --string-color: #4ecca3;
+    --number-color: #ffd566;
+    --bool-color: #ff6b9d;
+    --null-color: #a78bfa;
+    --hidden-opacity: 0.3;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+    white-space: nowrap;
+  }
+
+  .logo span { color: var(--text-dim); font-weight: 400; }
+
+  .toolbar {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex: 1;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 3px 9px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    transition: all 0.15s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .btn:hover { border-color: var(--border2); color: var(--text); background: var(--border); }
+  .btn.accent { border-color: var(--accent-dim); color: var(--accent); }
+  .btn.accent:hover { background: var(--accent-dim); }
+  .btn.danger { border-color: #3a1a1a; color: var(--red); }
+  .btn.danger:hover { background: #2a1010; }
+
+  .depth-btns { display: flex; gap: 2px; }
+  .depth-btn {
+    width: 22px; height: 22px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-muted);
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .depth-btn:hover { border-color: var(--border2); color: var(--text); background: var(--border); }
+  .depth-btn.active { border-color: var(--accent-dim); color: var(--accent); background: var(--accent-dim); }
+
+  .stats {
+    margin-left: auto;
+    color: var(--text-dim);
+    font-size: 11px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .stat-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-size: 10px;
+  }
+  .stat-badge span { color: var(--text); }
+
+  /* MAIN LAYOUT */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* INPUT PANEL */
+  .input-panel {
+    width: 340px;
+    min-width: 200px;
+    max-width: 50%;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    resize: horizontal;
+    overflow: auto;
+  }
+
+  .panel-header {
+    padding: 5px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  textarea {
+    flex: 1;
+    background: var(--bg);
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 10px 12px;
+    resize: none;
+    line-height: 1.45;
+  }
+  textarea::placeholder { color: var(--text-muted); }
+
+  /* TREE PANEL */
+  .tree-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .tree-search {
+    padding: 5px 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .search-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 8px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-input:focus { border-color: var(--accent-dim); }
+  .search-input::placeholder { color: var(--text-muted); }
+
+  .tree-scroll {
+    flex: 1;
+    overflow: auto;
+    padding: 6px 4px;
+  }
+
+  /* TREE NODES */
+  .node {
+    position: relative;
+    line-height: 1;
+  }
+
+  .node-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 1px 4px 1px 0;
+    border-radius: 4px;
+    cursor: default;
+    position: relative;
+    transition: background 0.1s;
+  }
+  .node-row:hover { background: var(--surface2); }
+  .node-row:hover .node-actions { opacity: 1; }
+
+  .node-indent {
+    display: flex;
+    align-items: stretch;
+    flex-shrink: 0;
+  }
+
+  .indent-line {
+    width: 14px;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .indent-line::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .toggle-btn {
+    width: 14px;
+    height: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    font-size: 8px;
+    border-radius: 3px;
+    transition: color 0.1s, background 0.1s;
+    user-select: none;
+  }
+  .toggle-btn:hover { color: var(--text); background: var(--border2); }
+
+  .node-key {
+    color: var(--key-color);
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.1s;
+  }
+  .node-key:hover { color: #7ab8ff; }
+
+  .node-colon { color: var(--text-muted); margin: 0 4px; }
+
+  .node-value-str  { color: var(--string-color); }
+  .node-value-num  { color: var(--number-color); }
+  .node-value-bool { color: var(--bool-color); }
+  .node-value-null { color: var(--null-color); font-style: italic; }
+
+  .node-bracket {
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+
+  .node-summary {
+    color: var(--text-muted);
+    font-size: 10px;
+    margin-left: 3px;
+    font-style: italic;
+  }
+
+  .node-actions {
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: auto;
+    padding-left: 8px;
+    transition: opacity 0.1s;
+  }
+
+  .act-btn {
+    width: 17px;
+    height: 17px;
+    border-radius: 3px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: all 0.1s;
+    font-size: 10px;
+    padding: 0;
+  }
+  .act-btn:hover { background: var(--border2); color: var(--text); }
+  .act-btn.hide-btn:hover { color: var(--red); }
+  .act-btn.copy-btn:hover { color: var(--accent); }
+
+  /* HIDDEN STATE */
+  .node.state-hidden > .node-row {
+    opacity: var(--hidden-opacity);
+  }
+  .node.state-hidden > .node-row .node-key {
+    text-decoration: line-through;
+    text-decoration-color: var(--red);
+  }
+  .node.state-hidden > .node-children { display: none; }
+  .node.state-hidden > .node-row .hide-icon { color: var(--red) !important; opacity: 1; }
+
+  /* COLLAPSED STATE */
+  .node.state-collapsed > .node-children { display: none; }
+
+  /* CHILDREN */
+  .node-children { margin: 0; }
+
+  /* HIGHLIGHT */
+  .highlight-match { background: #3a2a00; border-radius: 2px; color: var(--yellow); }
+
+  /* ERROR */
+  .parse-error {
+    padding: 16px;
+    color: var(--red);
+    font-size: 12px;
+    line-height: 1.6;
+    background: #1a0a0a;
+    border: 1px solid #3a1515;
+    border-radius: 6px;
+    margin: 12px;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.2s;
+    pointer-events: none;
+    z-index: 999;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+  /* PATH BAR */
+  .path-bar {
+    padding: 3px 12px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 9px;
+    color: var(--text-muted);
+    min-height: 20px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .path-bar span { color: var(--accent); }
+
+  /* HIDDEN PANEL */
+  .hidden-panel {
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+    max-height: 120px;
+    overflow-y: auto;
+  }
+  .hidden-panel-header {
+    padding: 6px 14px;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .hidden-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 8px 14px;
+  }
+  .hidden-tag {
+    background: #2a1010;
+    border: 1px solid #3a1515;
+    color: var(--red);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: background 0.1s;
+  }
+  .hidden-tag:hover { background: #3a1515; }
+  .hidden-tag .restore { color: var(--text-muted); font-size: 10px; }
+
+  /* FIELD FILTER PANEL */
+  .field-filter {
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  .field-filter-header {
+    padding: 5px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .field-filter-header:hover { background: var(--surface2); }
+  .field-filter-title {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    flex: 1;
+  }
+  .field-filter-toggle { color: var(--text-muted); font-size: 9px; }
+  .field-filter-body {
+    display: none;
+    padding: 6px 12px 8px;
+    border-top: 1px solid var(--border);
+  }
+  .field-filter-body.open { display: block; }
+  .preset-row {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .preset-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-right: 2px; }
+  .preset-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 2px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .preset-btn:hover { border-color: var(--border2); color: var(--text); background: var(--border); }
+  .preset-btn.active { border-color: var(--accent-dim); color: var(--accent); background: var(--accent-dim); }
+  .field-checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .field-check {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 8px;
+    cursor: pointer;
+    font-size: 10px;
+    color: var(--text-dim);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .field-check:hover { border-color: var(--border2); color: var(--text); }
+  .field-check.on { border-color: var(--green); color: var(--green); background: #0a2018; }
+  .field-check-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); flex-shrink: 0; transition: background 0.15s; }
+  .field-check.on .field-check-dot { background: var(--green); }
+  .ff-badge {
+    background: var(--accent-dim);
+    color: var(--accent);
+    border-radius: 3px;
+    font-size: 9px;
+    padding: 0 5px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .filter-sep { width: 1px; height: 12px; background: var(--border); margin: 0 2px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">JSON<span>zen</span></div>
+  <div class="toolbar">
+    <button class="btn accent" onclick="parseJSON()">▶ Parse</button>
+    <div class="sep"></div>
+    <button class="btn" onclick="expandAll()">⊞ Expand all</button>
+    <button class="btn" onclick="collapseAll()">⊟ Collapse all</button>
+    <button class="btn" onclick="showAll()">👁 Show all</button>
+    <div class="sep"></div>
+    <span style="color:var(--text-muted);font-size:10px;white-space:nowrap">Level:</span>
+    <div class="depth-btns" id="depth-btns"></div>
+    <div class="sep"></div>
+    <button class="btn" onclick="copyRoot()">⎘ Copy all</button>
+    <button class="btn" onclick="formatInput()">✦ Format</button>
+    <button class="btn danger" onclick="clearAll()">✕ Clear</button>
+  </div>
+  <div class="stats" id="stats"></div>
+</div>
+
+<div class="main">
+  <div class="input-panel">
+    <div class="panel-header">
+      Input JSON
+      <span id="char-count" style="color:var(--text-muted)"></span>
+    </div>
+    <textarea id="input" placeholder='Paste JSON here...&#10;&#10;{&#10;  "status": "ok",&#10;  "data": { ... }&#10;}' oninput="onInputChange()" onkeydown="handleInputKey(event)"></textarea>
+  </div>
+
+  <div class="tree-panel">
+    <div class="tree-search">
+      <input class="search-input" id="search" placeholder="🔍  Filter keys or values..." oninput="onSearch()" />
+      <div id="search-count" style="color:var(--text-muted);font-size:11px;white-space:nowrap"></div>
+    </div>
+    <div class="field-filter" id="field-filter" style="display:none">
+      <div class="field-filter-header" onclick="toggleFilterPanel()">
+        <span class="field-filter-title">Field Filter</span>
+        <span id="ff-badge" class="ff-badge" style="display:none"></span>
+        <span class="field-filter-toggle" id="ff-toggle">▶</span>
+      </div>
+      <div class="field-filter-body" id="ff-body">
+        <div class="preset-row">
+          <span class="preset-label">Presets:</span>
+          <button class="preset-btn" data-preset="api" onclick="applyPreset('api')" title="url + requestBody + responseBody">API view</button>
+          <button class="preset-btn" data-preset="headers" onclick="applyPreset('headers')" title="url + requestHeaders + responseHeaders">Headers</button>
+          <button class="preset-btn" data-preset="status" onclick="applyPreset('status')" title="url + method + statusCode">Status</button>
+          <button class="preset-btn" data-preset="all" onclick="applyPreset('all')" title="Show all fields">Show all</button>
+        </div>
+        <div class="field-checks" id="ff-checks"></div>
+      </div>
+    </div>
+    <div class="tree-scroll" id="tree"></div>
+    <div class="path-bar" id="path-bar">hover a node to see path</div>
+    <div class="hidden-panel" id="hidden-panel" style="display:none">
+      <div class="hidden-panel-header">
+        Hidden keys
+        <button class="btn" style="padding:2px 8px;font-size:10px" onclick="showAll()">restore all</button>
+      </div>
+      <div class="hidden-tags" id="hidden-tags"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+// Two independent state maps:
+//   collapseStates: path -> 'expanded' | 'collapsed'   (open/close)
+//   hideStates:     path -> true                        (manually hidden)
+//   filterHideKeys: Set of key names to hide via field filter
+let collapseStates = {};
+let manualHideStates = {};   // paths manually hidden by user (🚫 button)
+let filterHideKeys  = null;  // null = no filter; Set<string> = keys to HIDE
+let parsedData = null;
+let searchQuery = '';
+
+const COLLAPSED = 'collapsed';
+const HIDDEN    = 'hidden';
+const EXPANDED  = 'expanded';
+
+// Computed state for a given path+key
+function getState(path, keyName) {
+  // Manual hide wins over everything
+  if (manualHideStates[path]) return HIDDEN;
+  // Field filter hides matching keys at any depth inside array items
+  if (filterHideKeys && keyName !== null && filterHideKeys.has(String(keyName))) return HIDDEN;
+  // Collapse state
+  return collapseStates[path] || EXPANDED;
+}
+
+// ─── PARSE ───────────────────────────────────────────────────────────────────
+function parseJSON() {
+  const raw = document.getElementById('input').value.trim();
+  if (!raw) return;
+  try {
+    parsedData = JSON.parse(raw);
+    collapseStates = {};
+    manualHideStates = {};
+    renderTree();
+    updateStats();
+    initDepthButtons();
+    initFieldFilter();
+  } catch(e) {
+    document.getElementById('tree').innerHTML = `<div class="parse-error">⚠ Parse error: ${escHtml(e.message)}</div>`;
+    document.getElementById('stats').innerHTML = '';
+  }
+}
+
+function formatInput() {
+  const raw = document.getElementById('input').value.trim();
+  try {
+    const parsed = JSON.parse(raw);
+    document.getElementById('input').value = JSON.stringify(parsed, null, 2);
+    onInputChange();
+  } catch(e) { toast('Invalid JSON'); }
+}
+
+function onInputChange() {
+  const val = document.getElementById('input').value;
+  document.getElementById('char-count').textContent = val.length ? val.length.toLocaleString() + ' chars' : '';
+  if (val.trim()) {
+    try {
+      parsedData = JSON.parse(val);
+      collapseStates = {};
+      manualHideStates = {};
+      renderTree();
+      updateStats();
+      initDepthButtons();
+      initFieldFilter();
+    } catch(e) {}
+  }
+}
+
+function handleInputKey(e) {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) parseJSON();
+}
+
+function clearAll() {
+  document.getElementById('input').value = '';
+  document.getElementById('tree').innerHTML = '';
+  document.getElementById('stats').innerHTML = '';
+  document.getElementById('char-count').textContent = '';
+  document.getElementById('path-bar').textContent = 'hover a node to see path';
+  collapseStates = {};
+  manualHideStates = {};
+  filterHideKeys = null;
+  parsedData = null;
+  document.getElementById('field-filter').style.display = 'none';
+  document.getElementById('ff-checks').innerHTML = '';
+  updateFilterBadge();
+  updateHiddenPanel();
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function renderTree() {
+  const container = document.getElementById('tree');
+  if (parsedData === null) return;
+  container.innerHTML = '';
+  container.appendChild(buildNode(parsedData, null, '', 0, true));
+}
+
+function buildNode(value, key, path, depth, isArrayItem) {
+  const state = getState(path, key);
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'node state-' + state;
+  wrapper.dataset.path = path;
+
+  const isComplex = value !== null && typeof value === 'object';
+  const isArray = Array.isArray(value);
+
+  const row = document.createElement('div');
+  row.className = 'node-row';
+
+  // indent
+  const indentDiv = document.createElement('div');
+  indentDiv.className = 'node-indent';
+  for (let i = 0; i < depth; i++) {
+    const line = document.createElement('div');
+    line.className = 'indent-line';
+    indentDiv.appendChild(line);
+  }
+  row.appendChild(indentDiv);
+
+  // toggle
+  const toggle = document.createElement('div');
+  toggle.className = 'toggle-btn';
+  if (isComplex) {
+    toggle.textContent = state === COLLAPSED ? '▶' : '▼';
+    toggle.onclick = (e) => { e.stopPropagation(); cycleCollapse(path, wrapper, toggle); };
+  } else {
+    toggle.textContent = '·';
+    toggle.style.cursor = 'default';
+  }
+  row.appendChild(toggle);
+
+  // key
+  if (key !== null) {
+    const keyEl = document.createElement('span');
+    keyEl.className = 'node-key';
+    keyEl.textContent = typeof key === 'number' ? key : `"${key}"`;
+    keyEl.onclick = () => isComplex && cycleCollapse(path, wrapper, toggle);
+    row.appendChild(keyEl);
+    const colon = document.createElement('span');
+    colon.className = 'node-colon';
+    colon.textContent = ': ';
+    row.appendChild(colon);
+  }
+
+  // value
+  if (!isComplex) {
+    const valEl = document.createElement('span');
+    valEl.className = valueClass(value);
+    valEl.textContent = formatValue(value);
+    row.appendChild(valEl);
+  } else {
+    const open = document.createElement('span');
+    open.className = 'node-bracket';
+    open.textContent = isArray ? '[' : '{';
+    open.onclick = () => cycleCollapse(path, wrapper, toggle);
+    row.appendChild(open);
+
+    if (state !== EXPANDED) {
+      const summary = document.createElement('span');
+      summary.className = 'node-summary';
+      const count = isArray ? value.length : Object.keys(value).length;
+      summary.textContent = isArray ? ` ${count} items ` : ` ${count} keys `;
+      row.appendChild(summary);
+      const closeInline = document.createElement('span');
+      closeInline.className = 'node-bracket';
+      closeInline.textContent = isArray ? ']' : '}';
+      row.appendChild(closeInline);
+    }
+  }
+
+  // actions
+  const actions = document.createElement('div');
+  actions.className = 'node-actions';
+
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'act-btn copy-btn';
+  copyBtn.title = 'Copy node';
+  copyBtn.textContent = '⎘';
+  copyBtn.onclick = (e) => { e.stopPropagation(); copyNode(value, path); };
+  actions.appendChild(copyBtn);
+
+  const hideBtn = document.createElement('button');
+  hideBtn.className = 'act-btn hide-btn hide-icon';
+  hideBtn.title = manualHideStates[path] ? 'Show' : 'Hide';
+  hideBtn.textContent = manualHideStates[path] ? '👁' : '🚫';
+  hideBtn.onclick = (e) => { e.stopPropagation(); toggleManualHide(path); };
+  actions.appendChild(hideBtn);
+
+  row.appendChild(actions);
+
+  row.addEventListener('mouseenter', () => {
+    document.getElementById('path-bar').innerHTML = `<span>${path || '(root)'}</span>`;
+  });
+
+  wrapper.appendChild(row);
+
+  // children (only when EXPANDED and not hidden)
+  if (isComplex && state === EXPANDED) {
+    const childrenDiv = document.createElement('div');
+    childrenDiv.className = 'node-children';
+
+    const entries = isArray
+      ? value.map((v, i) => [i, v])
+      : Object.entries(value);
+
+    // Determine if children are array items (for field filter scoping)
+    const childrenAreArrayItems = isArray;
+
+    for (const [k, v] of entries) {
+      const childPath = path ? `${path}.${k}` : String(k);
+      childrenDiv.appendChild(buildNode(v, k, childPath, depth + 1, childrenAreArrayItems));
+    }
+
+    // closing bracket
+    const closeRow = document.createElement('div');
+    closeRow.className = 'node-row';
+    const ci = document.createElement('div');
+    ci.className = 'node-indent';
+    for (let i = 0; i < depth; i++) {
+      const line = document.createElement('div');
+      line.className = 'indent-line';
+      ci.appendChild(line);
+    }
+    closeRow.appendChild(ci);
+    const sp = document.createElement('div');
+    sp.style.width = '14px';
+    closeRow.appendChild(sp);
+    const cl = document.createElement('span');
+    cl.className = 'node-bracket';
+    cl.textContent = isArray ? ']' : '}';
+    closeRow.appendChild(cl);
+    childrenDiv.appendChild(closeRow);
+
+    wrapper.appendChild(childrenDiv);
+  }
+
+  return wrapper;
+}
+
+// ─── COLLAPSE STATE ───────────────────────────────────────────────────────────
+function cycleCollapse(path, wrapper, toggle) {
+  const cur = collapseStates[path] || EXPANDED;
+  const next = cur === EXPANDED ? COLLAPSED : EXPANDED;
+  collapseStates[path] = next;
+  renderTree();
+}
+
+function toggleManualHide(path) {
+  if (manualHideStates[path]) {
+    delete manualHideStates[path];
+  } else {
+    manualHideStates[path] = true;
+  }
+  updateHiddenPanel();
+  renderTree();
+}
+
+// ─── BULK OPS ────────────────────────────────────────────────────────────────
+function expandAll() {
+  collapseStates = {};
+  document.querySelectorAll('.depth-btn').forEach(b => b.classList.remove('active'));
+  renderTree();
+}
+
+function collapseAll() {
+  if (!parsedData) return;
+  collapseStates = {};
+  walkPaths(parsedData, '', (p, v) => {
+    if (v !== null && typeof v === 'object') collapseStates[p] = COLLAPSED;
+  }, 0);
+  renderTree();
+}
+
+function collapseToDepth(maxDepth) {
+  if (!parsedData) return;
+  collapseStates = {};
+  walkPaths(parsedData, '', (p, v, d) => {
+    if (v !== null && typeof v === 'object') {
+      collapseStates[p] = d >= maxDepth ? COLLAPSED : EXPANDED;
+    }
+  }, 0);
+  renderTree();
+  document.querySelectorAll('.depth-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.depth) === maxDepth);
+  });
+}
+
+function showAll() {
+  manualHideStates = {};
+  filterHideKeys = null;
+  document.querySelectorAll('.field-check').forEach(c => c.classList.add('on'));
+  updatePresetActive('all');
+  updateFilterBadge();
+  updateHiddenPanel();
+  renderTree();
+}
+
+function initDepthButtons() {
+  const container = document.getElementById('depth-btns');
+  container.innerHTML = '';
+  let maxD = 0;
+  if (parsedData) walkPaths(parsedData, '', (p,v,d) => { maxD = Math.max(maxD, d); }, 0);
+  const levels = Math.min(maxD, 8);
+  for (let i = 1; i <= levels; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'depth-btn';
+    btn.dataset.depth = i;
+    btn.textContent = i;
+    btn.title = `Collapse from depth ${i}`;
+    btn.onclick = () => collapseToDepth(i);
+    container.appendChild(btn);
+  }
+}
+
+function walkPaths(obj, path, fn, depth) {
+  fn(path, obj, depth);
+  if (obj !== null && typeof obj === 'object') {
+    const entries = Array.isArray(obj) ? obj.map((v, i) => [i, v]) : Object.entries(obj);
+    for (const [k, v] of entries) {
+      walkPaths(v, path ? `${path}.${k}` : String(k), fn, depth + 1);
+    }
+  }
+}
+
+// ─── COPY ────────────────────────────────────────────────────────────────────
+function copyNode(value, path) {
+  const text = typeof value === 'object' && value !== null ? JSON.stringify(value, null, 2) : String(value);
+  navigator.clipboard.writeText(text).then(() => toast(`Copied ${path || 'root'}`));
+}
+
+function copyRoot() {
+  if (!parsedData) return;
+  navigator.clipboard.writeText(JSON.stringify(parsedData, null, 2)).then(() => toast('Copied'));
+}
+
+// ─── SEARCH ──────────────────────────────────────────────────────────────────
+function onSearch() {
+  searchQuery = document.getElementById('search').value.toLowerCase();
+  if (!parsedData) return;
+  if (!searchQuery) {
+    renderTree();
+    document.getElementById('search-count').textContent = '';
+    return;
+  }
+  renderTree();
+  let matches = 0;
+  document.querySelectorAll('.node').forEach(node => {
+    const path = node.dataset.path;
+    const keyPart = path.split('.').pop() || '';
+    const valueEl = node.querySelector('.node-row > span:not(.node-key):not(.node-colon):not(.node-bracket):not(.node-summary)');
+    const valText = valueEl ? valueEl.textContent.toLowerCase() : '';
+    const keyMatch = keyPart.toLowerCase().includes(searchQuery);
+    const valMatch = valText.includes(searchQuery);
+    if (keyMatch || valMatch) {
+      matches++;
+      node.style.display = '';
+    } else {
+      const hasChildren = node.querySelector('.node-children');
+      if (!hasChildren) node.style.display = 'none';
+    }
+  });
+  document.getElementById('search-count').textContent = matches ? `${matches} match` : 'no matches';
+}
+
+// ─── HIDDEN PANEL ────────────────────────────────────────────────────────────
+function updateHiddenPanel() {
+  const panel = document.getElementById('hidden-panel');
+  const tags = document.getElementById('hidden-tags');
+  const hiddenPaths = Object.keys(manualHideStates);
+  if (!hiddenPaths.length) { panel.style.display = 'none'; return; }
+  panel.style.display = '';
+  tags.innerHTML = '';
+  hiddenPaths.forEach(p => {
+    const tag = document.createElement('div');
+    tag.className = 'hidden-tag';
+    tag.innerHTML = `🚫 ${p} <span class="restore">↩</span>`;
+    tag.onclick = () => { delete manualHideStates[p]; updateHiddenPanel(); renderTree(); };
+    tags.appendChild(tag);
+  });
+}
+
+// ─── STATS ───────────────────────────────────────────────────────────────────
+function updateStats() {
+  if (!parsedData) return;
+  let keys = 0, depth = 0;
+  function walk(o, d) {
+    depth = Math.max(depth, d);
+    if (o !== null && typeof o === 'object') {
+      const list = Array.isArray(o) ? o.map((v,i) => [i,v]) : Object.entries(o);
+      for (const [k, v] of list) { keys++; walk(v, d+1); }
+    }
+  }
+  walk(parsedData, 0);
+  document.getElementById('stats').innerHTML =
+    `<div class="stat-badge">keys <span>${keys.toLocaleString()}</span></div>` +
+    `<div class="stat-badge">depth <span>${depth}</span></div>`;
+}
+
+// ─── FIELD FILTER ────────────────────────────────────────────────────────────
+// filterHideKeys: Set of key names to HIDE everywhere they appear as keys of
+// objects that are items in any array. null = no filter.
+
+const PRESETS = {
+  api:     new Set(['url', 'method', 'statusCode', 'requestBody', 'responseBody']),
+  headers: new Set(['url', 'method', 'statusCode', 'requestHeaders', 'responseHeaders']),
+  status:  new Set(['url', 'method', 'statusCode']),
+};
+
+// Scan JSON recursively for all keys that appear inside array items
+function detectArrayItemKeys(data) {
+  const keySet = new Set();
+  function scan(val) {
+    if (!val || typeof val !== 'object') return;
+    if (Array.isArray(val)) {
+      val.forEach(item => {
+        if (item && typeof item === 'object' && !Array.isArray(item)) {
+          Object.keys(item).forEach(k => keySet.add(k));
+          // recurse into item values too (for nested arrays)
+          Object.values(item).forEach(scan);
+        } else {
+          scan(item);
+        }
+      });
+    } else {
+      Object.values(val).forEach(scan);
+    }
+  }
+  scan(data);
+  return keySet;
+}
+
+function initFieldFilter() {
+  const fields = detectArrayItemKeys(parsedData);
+  if (!fields.size) {
+    document.getElementById('field-filter').style.display = 'none';
+    return;
+  }
+  document.getElementById('field-filter').style.display = '';
+  filterHideKeys = null;
+  updatePresetActive(null);
+  updateFilterBadge();
+
+  const container = document.getElementById('ff-checks');
+  container.innerHTML = '';
+  [...fields].sort().forEach(key => {
+    const chip = document.createElement('div');
+    chip.className = 'field-check on';
+    chip.dataset.field = key;
+    chip.innerHTML = `<div class="field-check-dot"></div>${key}`;
+    chip.onclick = () => {
+      chip.classList.toggle('on');
+      rebuildFilterFromChips();
+    };
+    container.appendChild(chip);
+  });
+}
+
+function rebuildFilterFromChips() {
+  const allChips = [...document.querySelectorAll('.field-check')];
+  const onFields = allChips.filter(c => c.classList.contains('on')).map(c => c.dataset.field);
+  const allFields = allChips.map(c => c.dataset.field);
+  // filterHideKeys = set of fields that are OFF (to hide)
+  const offFields = allFields.filter(f => !onFields.includes(f));
+  filterHideKeys = offFields.length > 0 ? new Set(offFields) : null;
+  updatePresetActive(null);
+  updateFilterBadge();
+  renderTree();
+}
+
+function toggleFilterPanel() {
+  const body = document.getElementById('ff-body');
+  const toggle = document.getElementById('ff-toggle');
+  body.classList.toggle('open');
+  toggle.textContent = body.classList.contains('open') ? '▼' : '▶';
+}
+
+function applyPreset(name) {
+  const allChips = [...document.querySelectorAll('.field-check')];
+  if (name === 'all') {
+    allChips.forEach(c => c.classList.add('on'));
+    filterHideKeys = null;
+  } else {
+    const show = PRESETS[name];
+    const offFields = [];
+    allChips.forEach(c => {
+      if (show && show.has(c.dataset.field)) {
+        c.classList.add('on');
+      } else {
+        c.classList.remove('on');
+        offFields.push(c.dataset.field);
+      }
+    });
+    filterHideKeys = offFields.length > 0 ? new Set(offFields) : null;
+  }
+  updatePresetActive(name);
+  updateFilterBadge();
+  // auto-open panel
+  const body = document.getElementById('ff-body');
+  if (!body.classList.contains('open')) toggleFilterPanel();
+  renderTree();
+}
+
+function updatePresetActive(name) {
+  document.querySelectorAll('.preset-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.preset === name);
+  });
+}
+
+function updateFilterBadge() {
+  const badge = document.getElementById('ff-badge');
+  if (!filterHideKeys || filterHideKeys.size === 0) {
+    badge.style.display = 'none';
+  } else {
+    badge.style.display = '';
+    const total = document.querySelectorAll('.field-check').length;
+    const showing = total - filterHideKeys.size;
+    badge.textContent = `${showing}/${total}`;
+  }
+}
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+function valueClass(v) {
+  if (v === null) return 'node-value-null';
+  if (typeof v === 'string') return 'node-value-str';
+  if (typeof v === 'number') return 'node-value-num';
+  if (typeof v === 'boolean') return 'node-value-bool';
+  return 'node-value-str';
+}
+
+function formatValue(v) {
+  if (v === null) return 'null';
+  if (typeof v === 'string') return `"${v}"`;
+  return String(v);
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+document.getElementById('input').addEventListener('paste', () => {
+  setTimeout(() => { onInputChange(); }, 10);
+});
+
+window.addEventListener('load', () => {
+  const demo = `{
+  "status": "ok",
+  "meta": {
+    "request_id": "req_abc123",
+    "timestamp": "2026-02-20T10:30:00Z",
+    "version": "2.1"
+  },
+  "data": {
+    "user": {
+      "id": 42,
+      "name": "Alex Developer",
+      "email": "alex@example.com",
+      "roles": ["admin", "viewer"],
+      "settings": {
+        "theme": "dark",
+        "notifications": true,
+        "items_per_page": 25
+      }
+    },
+    "items": [
+      { "id": 1, "title": "First item", "active": true, "score": 9.5 },
+      { "id": 2, "title": "Second item", "active": false, "score": 7.2 },
+      { "id": 3, "title": "Third item", "active": true, "score": 8.8 }
+    ],
+    "pagination": {
+      "page": 1,
+      "per_page": 25,
+      "total": 3,
+      "next": null
+    }
+  }
+}`;
+  document.getElementById('input').value = demo;
+  onInputChange();
+});
+</script>
+</body>
+</html>
