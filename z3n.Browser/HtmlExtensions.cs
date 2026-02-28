@@ -20,7 +20,6 @@ namespace z3nCore
             }
             catch (Exception) { return "qrError"; }
         }
-        
         public static string GetXPath(this HtmlElement element)
         {
             if (element.IsVoid || element.IsNull)

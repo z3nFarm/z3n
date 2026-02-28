@@ -540,9 +540,15 @@ namespace z3nCore
                 return $"{ex.Message}";
             }
         }
-        
-        
-        
+
+        public static void CenterMouse(this Instance instance)
+        {
+            int[] center = instance.GetCenter();
+            instance.ActiveTab.MainDocument.EvaluateScript(
+                $"document.elementFromPoint({center[0]}, {center[1]})?.dispatchEvent(new MouseEvent('mousemove', {{clientX: {center[0]}, clientY: {center[1]}, bubbles: true}}));"
+            );
+        }
+
         #endregion
         
         #region Browser Management

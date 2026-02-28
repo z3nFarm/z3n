@@ -179,6 +179,67 @@ namespace z3nCore
             return element.GetAllResponseHeaders();
         }
 
+        
+        public enum Filter
+        {
+            NoFilter,
+            /// <summary>Всё включено, файлы исключены</summary>
+            Debug,
+
+            /// <summary>URL + Body + Headers + Cookies</summary>
+            ApiPrivate,
+
+            /// <summary>URL + Body только</summary>
+            Api
+        }
+        
+        public string GetApiStructure(
+            string urlFilter = "api",
+            Filter preset = Filter.Api)
+        {
+            switch (preset)
+            {
+                case Filter.NoFilter:
+                    return GetApiStructure(
+                        urlFilter,
+                        includeStatus:  true,
+                        includeHeaders: true,
+                        includeBodies:  true,
+                        includeCookies: true,
+                        excludeFiles:   false);
+                
+                case Filter.Debug:
+                    return GetApiStructure(
+                        urlFilter,
+                        includeStatus:  true,
+                        includeHeaders: true,
+                        includeBodies:  true,
+                        includeCookies: true,
+                        excludeFiles:   true);
+
+                case Filter.ApiPrivate:
+                    return GetApiStructure(
+                        urlFilter,
+                        includeStatus:  false,
+                        includeHeaders: true,
+                        includeBodies:  true,
+                        includeCookies: true,
+                        excludeFiles:   true);
+
+                case Filter.Api:
+                    return GetApiStructure(
+                        urlFilter,
+                        includeStatus:  false,
+                        includeHeaders: false,
+                        includeBodies:  true,
+                        includeCookies: false,
+                        excludeFiles:   true);
+
+                default:
+                    throw new ArgumentOutOfRangeException("preset", preset, null);
+            }
+        }
+        
         public string GetApiStructure(
             string urlFilter = "api",
             bool includeStatus = true,   // 0
